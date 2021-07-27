@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" href="favicon.ico" type="image/x-icon">
+		<link rel="stylesheet" href="css/normalize.css">
+		<link rel="stylesheet" href="css/main.css">
+		<title>Badreads</title>
+	</head>
+	<body>
+		<header>
+			<h1 id="library-title">badreads</h1>
+			<button id="new-book">New Book</button>
+		</header>
+		<div id="new-book-modal">
+			<div class="modal-content">
+				<span id="close-modal">&times;</span>
+				<h2>Add a new book</h2>
+				<form id="form-modal">
+					<div class="form-entry">
+						<label for="title">Title</label>
+						<input class="book-field" type="text" id="title" name="title" autocomplete="off" required>
+					</div>
+					<div class="form-entry">
+						<label for="author">Author</label>
+						<input class="book-field" type="text" id="author" name="author" autocomplete="off" required>
+					</div>
+					<div class="form-entry">
+						<label for="pages">Number of pages</label>
+						<input class="book-field" type="text" id="pages" name="pages" autocomplete="off" required>
+					</div>
+					<div class="form-entry">
+						<label for="imageLink">Image link (optional)</label>
+						<input class="book-field" type="text" id="imageLink" name="imageLink" autocomplete="off">
+					</div>
+					<div class="form-entry">
+						<label for="alreadyRead">
+							<input class="book-field" type="checkbox" id="alreadyRead" name="alreadyRead" value="Already read">
+							Already read
+						</label>
+					</div>
+					<div id="submit-button">
+						<button type="button">Add Book</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<script src="js/book.js"></script>
+	</body>
+</html>
