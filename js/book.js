@@ -73,6 +73,16 @@ const cardProto = {
     bookInfo.appendChild(info);
     this.associatedDiv.appendChild(bookInfo);
     return this;
+  },
+  alternateBackground(index) {
+    return index % 2 == 0 ? "rgb(220, 220, 220)" : "rgb(235, 235, 235)";
+  },
+  createDivCard(bookRemover, readToggler) {
+    const divCard = this.createBookPhoto().createBookInfo(bookRemover, readToggler).associatedDiv;
+    divCard.classList.add("card");
+    divCard.setAttribute("index", this.book.index);
+    divCard.style.backgroundColor = this.alternateBackground(this.book.index);
+    return divCard;
   }
 };
 
@@ -119,21 +129,6 @@ let modalForm = (function() {
   }
 })();
 
-let cardCreator = (function() {
-  this.alternateBackground = function(index) {
-    return index % 2 == 0 ? "rgb(220, 220, 220)" : "rgb(235, 235, 235)";
-  }
-  return {
-    createBookCard: function(book, bookRemover, readToggler) {
-      const divCard = createCard(book).createBookPhoto().createBookInfo(bookRemover, readToggler).associatedDiv;
-      divCard.classList.add("card");
-      divCard.setAttribute("index", book.index);
-      divCard.style.backgroundColor = alternateBackground(book.index);
-      return divCard;
-    },
-  }
-})();
-
 let libraryApp = (function() {
   let library = [];
   let modal = modalForm;
@@ -161,7 +156,7 @@ let libraryApp = (function() {
     let index = 0;
     library.forEach(book => {
       book.index = index;
-      const divCard = cardCreator.createBookCard(book, this.removeBookFromLibrary, this.readToggle);
+      const divCard = createCard(book).createDivCard(this.removeBookFromLibrary, this.readToggle);
       booksContainerDiv.appendChild(divCard);
       index += 1;
     });
