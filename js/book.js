@@ -3,11 +3,9 @@ const createBook = function(title, author, pages, imageLink, alreadyRead) {
   return Object.assign(newBook, {title, author, pages, imageLink, alreadyRead});
 };
 const bookProto = {
-  readOrNot() {
-    return this.alreadyRead ? "already read" : "not read yet";
-  },
   info() {
-    return `${this.title} by ${this.author}, ${this.pages} pages, ${this.readOrNot()}`;
+    let readValue = this.alreadyRead ? "already read" : "not read yet";
+    return `${this.title} by ${this.author}, ${this.pages} pages, ${readValue}`;
   },
   toggleRead() {
     this.alreadyRead = !this.alreadyRead;
