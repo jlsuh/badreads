@@ -32,14 +32,10 @@ const cardProto = {
     }
     return url.protocol === "http:" || url.protocol === "https:";
   },
-  setImageAttrs(img) {
-    img.src = this.imageLink;
-    img.alt = this.alt;
-    return img;
-  },
   createImage() {
     const img = document.createElement("img");
-    this.setImageAttrs(img);
+    img.src = this.imageLink;
+    img.alt = this.alt;
     return img;
   },
   createButton(className, textContent, callback) {
@@ -51,7 +47,7 @@ const cardProto = {
   },
   createBookPhoto() {
     const bookPhoto = document.createElement("div");
-    const img = this.createImage(this.imageLink);
+    const img = this.createImage();
     bookPhoto.classList = "book-photo";
     bookPhoto.appendChild(img);
     this.associatedDiv.appendChild(bookPhoto);
@@ -74,14 +70,14 @@ const cardProto = {
     this.associatedDiv.appendChild(bookInfo);
     return this;
   },
-  alternateBackground(index) {
-    return index % 2 == 0 ? "rgb(220, 220, 220)" : "rgb(235, 235, 235)";
-  },
   createDivCard(bookRemover, readToggler) {
+    const alternateBackground = (index) => {
+      return index % 2 == 0 ? "rgb(220, 220, 220)" : "rgb(235, 235, 235)";
+    };
     const divCard = this.createBookPhoto().createBookInfo(bookRemover, readToggler).associatedDiv;
     divCard.classList.add("card");
     divCard.setAttribute("index", this.book.index);
-    divCard.style.backgroundColor = this.alternateBackground(this.book.index);
+    divCard.style.backgroundColor = alternateBackground(this.book.index);
     return divCard;
   }
 };
