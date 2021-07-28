@@ -1,13 +1,18 @@
-function Book(title, author, pages, imageLink, alreadyRead) {
-  this.title = title;
-  this.author = author;
-  this.pages = pages;
-  this.imageLink = imageLink;
-  this.alreadyRead = alreadyRead;
-}
-Book.prototype.readOrNot = function() { return this.alreadyRead ? "already read" : "not read yet"; }
-Book.prototype.info = function() { return `${this.title} by ${this.author}, ${this.pages} pages, ${this.readOrNot()}`; }
-Book.prototype.toggleRead = function() { this.alreadyRead = !this.alreadyRead; }
+const createBook = function(title, author, pages, imageLink, alreadyRead) {
+  const newBook = Object.create(bookProto);
+  return Object.assign(newBook, {title, author, pages, imageLink, alreadyRead});
+};
+const bookProto = {
+  readOrNot() {
+    return this.alreadyRead ? "already read" : "not read yet";
+  },
+  info() {
+    return `${this.title} by ${this.author}, ${this.pages} pages, ${this.readOrNot()}`;
+  },
+  toggleRead() {
+    this.alreadyRead = !this.alreadyRead;
+  }
+};
 
 function Card(book) {
   this.book = book;
@@ -136,7 +141,7 @@ let libraryApp = (function() {
     const pages = formElements.pages.value;
     const imageLink = formElements.imageLink.value;
     const alreadyRead = formElements.alreadyRead.checked;
-    return new Book(title, author, pages, imageLink, alreadyRead);
+    return createBook(title, author, pages, imageLink, alreadyRead);
   }
   this.addBookToLibrary = function() {
     const book = getBookFromModal();
@@ -178,7 +183,8 @@ let libraryApp = (function() {
     const deserializedLibrary = JSON.parse(window.localStorage.getItem("library") || "[]");
     const associatedBooks = [];
     deserializedLibrary.forEach(book => {
-      associatedBooks.push(Object.create(Book.prototype, Object.getOwnPropertyDescriptors(book)));
+      console.log("Book value: ", book);
+      associatedBooks.push(createBook(book.title, book.author, book.pages, book.imageLink, book.alreadyRead));
     });
     return associatedBooks;
   }
@@ -188,6 +194,7 @@ let libraryApp = (function() {
   return {
     init: function() {
       library = fetchLibraryFromLocalStorage();
+      console.log("Library value: ", library);
       modalForm.init();
       if(library !== []) {
         displayBooks();
