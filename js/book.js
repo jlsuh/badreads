@@ -12,13 +12,18 @@ const bookProto = {
   }
 };
 
-function Card(book) {
-  this.book = book;
-  [this.imageLink, this.alt] =
-    (book.imageLink !== "" && isValidHttpUrl(book.imageLink)) ?
-      [book.imageLink, `${this.book.title} book photo`] : ["/img/no-photo.jpg", "No photo provided photo"];
-  this.associatedDiv = document.createElement("div");
-  function isValidHttpUrl(str) {
+const createCard = function(book) {
+  const newCard = Object.create(cardProto);
+  let imageLink;
+  let alt;
+  [imageLink, alt] =
+    (book.imageLink !== "" && newCard.isValidHttpUrl(book.imageLink)) ?
+      [book.imageLink, `${book.title} book photo`] : ["/img/no-photo.jpg", "No photo provided photo"];
+  let associatedDiv = document.createElement("div");
+  return Object.assign(newCard, {book, imageLink, alt, associatedDiv});
+};
+const cardProto = {
+  isValidHttpUrl(str) {
     let url;
     try {
       url = new URL(str);
@@ -26,50 +31,50 @@ function Card(book) {
       return false;  
     }
     return url.protocol === "http:" || url.protocol === "https:";
-  }
-  Card.prototype.setImageAttrs = function(img) {
+  },
+  setImageAttrs(img) {
     img.src = this.imageLink;
     img.alt = this.alt;
     return img;
-  }
-  Card.prototype.createImage = function() {
+  },
+  createImage() {
     const img = document.createElement("img");
     this.setImageAttrs(img);
     return img;
-  }
-  Card.prototype.createButton = function(className, textContent, callback) {
+  },
+  createButton(className, textContent, callback) {
     const removeButton = document.createElement("button");
     removeButton.classList.add(className);
     removeButton.textContent = textContent;
     removeButton.addEventListener("click", callback);
     return removeButton;
+  },
+  createBookPhoto() {
+    const bookPhoto = document.createElement("div");
+    const img = this.createImage(this.imageLink);
+    bookPhoto.classList = "book-photo";
+    bookPhoto.appendChild(img);
+    this.associatedDiv.appendChild(bookPhoto);
+    return this;
+  },
+  createBookInfo(bookRemover, readToggler) {
+    const bookInfo = document.createElement("div");
+    const info = document.createElement("div");
+    const removeButton = this.createButton("remove-button", "Remove", bookRemover);
+    const buttonContainer = document.createElement("div");
+    const readToggleButton = this.createButton("read-toggle", "Toggle Read", readToggler);
+    bookInfo.classList.add("book-info");
+    info.classList.add("about-book");
+    buttonContainer.classList.add("buttons-container");
+    info.textContent = this.book.info();
+    buttonContainer.appendChild(removeButton);
+    buttonContainer.appendChild(readToggleButton);
+    bookInfo.appendChild(buttonContainer);
+    bookInfo.appendChild(info);
+    this.associatedDiv.appendChild(bookInfo);
+    return this;
   }
-}
-Card.prototype.createBookPhoto = function() {
-  const bookPhoto = document.createElement("div");
-  const img = this.createImage(this.imageLink);
-  bookPhoto.classList = "book-photo";
-  bookPhoto.appendChild(img);
-  this.associatedDiv.appendChild(bookPhoto);
-  return this;
-}
-Card.prototype.createBookInfo = function(bookRemover, readToggler) {
-  const bookInfo = document.createElement("div");
-  const info = document.createElement("div");
-  const removeButton = this.createButton("remove-button", "Remove", bookRemover);
-  const buttonContainer = document.createElement("div");
-  const readToggleButton = this.createButton("read-toggle", "Toggle Read", readToggler);
-  bookInfo.classList.add("book-info");
-  info.classList.add("about-book");
-  buttonContainer.classList.add("buttons-container");
-  info.textContent = this.book.info();
-  buttonContainer.appendChild(removeButton);
-  buttonContainer.appendChild(readToggleButton);
-  bookInfo.appendChild(buttonContainer);
-  bookInfo.appendChild(info);
-  this.associatedDiv.appendChild(bookInfo);
-  return this;
-}
+};
 
 let modalForm = (function() {
   const modal = document.getElementById("new-book-modal");
@@ -120,7 +125,7 @@ let cardCreator = (function() {
   }
   return {
     createBookCard: function(book, bookRemover, readToggler) {
-      const divCard = new Card(book).createBookPhoto().createBookInfo(bookRemover, readToggler).associatedDiv;
+      const divCard = createCard(book).createBookPhoto().createBookInfo(bookRemover, readToggler).associatedDiv;
       divCard.classList.add("card");
       divCard.setAttribute("index", book.index);
       divCard.style.backgroundColor = alternateBackground(book.index);
@@ -181,7 +186,6 @@ let libraryApp = (function() {
     const deserializedLibrary = JSON.parse(window.localStorage.getItem("library") || "[]");
     const associatedBooks = [];
     deserializedLibrary.forEach(book => {
-      console.log("Book value: ", book);
       associatedBooks.push(createBook(book.title, book.author, book.pages, book.imageLink, book.alreadyRead));
     });
     return associatedBooks;
@@ -192,7 +196,6 @@ let libraryApp = (function() {
   return {
     init: function() {
       library = fetchLibraryFromLocalStorage();
-      console.log("Library value: ", library);
       modalForm.init();
       if(library !== []) {
         displayBooks();
