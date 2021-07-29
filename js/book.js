@@ -30,12 +30,6 @@ function createCard(book) {
     }
     return url.protocol === "http:" || url.protocol === "https:";
   }
-  function createImage() {
-    const img = document.createElement("img");
-    img.src = imageLink;
-    img.alt = alt;
-    return img;
-  }
   function createButton(className, textContent, callback) {
     const removeButton = document.createElement("button");
     removeButton.classList.add(className);
@@ -43,15 +37,21 @@ function createCard(book) {
     removeButton.addEventListener("click", callback);
     return removeButton;
   }
-  function createBookPhoto(div) {
+  function setImage() {
+    const img = document.createElement("img");
+    img.src = imageLink;
+    img.alt = alt;
+    return img;
+  }
+  function setBookPhoto(div) {
     const bookPhoto = document.createElement("div");
-    const img = createImage();
+    const img = setImage();
     bookPhoto.classList = "book-photo";
     bookPhoto.appendChild(img);
     div.appendChild(bookPhoto);
     return div;
   }
-  function createBookInfo(div, bookRemover, readToggler) {
+  function setBookInfo(div, bookRemover, readToggler) {
     const bookInfo = document.createElement("div");
     const info = document.createElement("div");
     const removeButton = createButton("remove-button", "Remove", bookRemover);
@@ -77,11 +77,12 @@ function createCard(book) {
         return index % 2 == 0 ? "rgb(220, 220, 220)" : "rgb(235, 235, 235)";
       };
       const div = document.createElement("div");
-      const divCard = createBookInfo(createBookPhoto(div), bookRemover, readToggler);
-      divCard.classList.add("card");
-      divCard.setAttribute("index", book.index);
-      divCard.style.backgroundColor = alternateBackground(book.index);
-      return divCard;
+      setBookPhoto(div);
+      setBookInfo(div, bookRemover, readToggler);
+      div.classList.add("card");
+      div.setAttribute("index", book.index);
+      div.style.backgroundColor = alternateBackground(book.index);
+      return div;
     }
   };
 }
