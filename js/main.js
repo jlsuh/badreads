@@ -142,7 +142,7 @@ let libraryApp = (function() {
   }
   function addBookToLibrary() {
     const book = getBookFromModal();
-    library.push(book);
+    library.unshift(book);
     modal.restoreFields();
     refreshBooksContainer();
   }
