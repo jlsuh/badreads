@@ -125,13 +125,13 @@ let modalForm = (function() {
       });
     },
     restoreFields
-  }
+  };
 })();
 
 let libraryApp = (function() {
   let library = [];
   let modal = modalForm;
-  this.getBookFromModal = function() {
+  function getBookFromModal() {
     const formElements = document.getElementById("form-modal").elements;
     const title = formElements.title.value;
     const author = formElements.author.value;
@@ -140,43 +140,43 @@ let libraryApp = (function() {
     const alreadyRead = formElements.alreadyRead.checked;
     return createBook(title, author, pages, imageLink, alreadyRead);
   }
-  this.addBookToLibrary = function() {
+  function addBookToLibrary() {
     const book = getBookFromModal();
     library.push(book);
     modal.restoreFields();
     refreshBooksContainer();
   }
-  this.removeBooks = function() {
+  function removeBooks() {
     document.body.removeChild(document.getElementById("books-container"));
   }
-  this.displayBooks = function() {
+  function displayBooks() {
     const booksContainerDiv = document.createElement("div");
     booksContainerDiv.id = "books-container";
     let index = 0;
     library.forEach(book => {
       book.index = index;
-      const divCard = createCard(book).createDivCard(this.removeBookFromLibrary, this.readToggle);
+      const divCard = createCard(book).createDivCard(removeBookFromLibrary, readToggle);
       booksContainerDiv.appendChild(divCard);
       index += 1;
     });
     document.body.appendChild(booksContainerDiv);
   }
-  this.removeBookFromLibrary = function(e){
+  function removeBookFromLibrary(e){
     const index = getBookIndex(e);
     library.splice(index, 1);
     refreshBooksContainer();
   }
-  this.readToggle = function(e) {
+  function readToggle(e) {
     const index = getBookIndex(e);
     library[index].toggleRead();
     refreshBooksContainer();
   }
-  this.refreshBooksContainer = function() {
+  function refreshBooksContainer() {
     window.localStorage.setItem("library", JSON.stringify(library));
-    this.removeBooks();
-    this.displayBooks();
+    removeBooks();
+    displayBooks();
   }
-  this.fetchLibraryFromLocalStorage = function() {
+  function fetchLibraryFromLocalStorage() {
     const deserializedLibrary = JSON.parse(window.localStorage.getItem("library") || "[]");
     const associatedBooks = [];
     deserializedLibrary.forEach(book => {
@@ -184,19 +184,19 @@ let libraryApp = (function() {
     });
     return associatedBooks;
   }
-  this.getBookIndex = function(e) {
+  function getBookIndex(e) {
     return e.currentTarget.parentNode.parentNode.parentNode.getAttribute("index");
   }
   return {
-    init: function() {
+    init() {
       library = fetchLibraryFromLocalStorage();
       modalForm.init();
       if(library !== []) {
         displayBooks();
       }
       document.getElementById("submit-button").addEventListener("click", addBookToLibrary);
-    },
-  }
+    }
+  };
 })();
 
 libraryApp.init();
