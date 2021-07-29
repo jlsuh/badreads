@@ -9,7 +9,7 @@ function createBook(title, author, pages, imageLink, alreadyRead) {
       this.alreadyRead = !this.alreadyRead;
     },
     info() {
-      let readValue = this.alreadyRead ? "already read" : "not read yet";
+      const readValue = this.alreadyRead ? "already read" : "not read yet";
       return `${this.title} by ${this.author}, ${this.pages} pages, ${readValue}`;
     }
   };
