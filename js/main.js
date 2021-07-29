@@ -26,10 +26,18 @@ function createCard(book) {
     try {
       url = new URL(str);
     } catch (_) {
-      return false;  
+      return false;
     }
     return url.protocol === "http:" || url.protocol === "https:";
   }
+  return {
+    book,
+    imageLink,
+    alt
+  };
+}
+
+let cardCreator = (function(document) {
   function createButton(className, textContent, callback) {
     const removeButton = document.createElement("button");
     removeButton.classList.add(className);
@@ -37,25 +45,25 @@ function createCard(book) {
     removeButton.addEventListener("click", callback);
     return removeButton;
   }
-  function setImage() {
+  function setImage(card) {
     const img = document.createElement("img");
-    img.src = imageLink;
-    img.alt = alt;
+    img.src = card.imageLink;
+    img.alt = card.alt;
     return img;
   }
-  function setBookPhoto(div) {
+  function setBookPhoto(card, div) {
     const bookPhoto = document.createElement("div");
-    const img = setImage();
+    const img = setImage(card);
     bookPhoto.classList = "book-photo";
     bookPhoto.appendChild(img);
     div.appendChild(bookPhoto);
     return div;
   }
-  function setBookInfo(div, bookRemover, readToggler) {
+  function setBookInfo(div, book, bookRemover, readToggler) {
     const bookInfo = document.createElement("div");
     const info = document.createElement("div");
-    const removeButton = createButton("remove-button", "Remove", bookRemover);
     const buttonContainer = document.createElement("div");
+    const removeButton = createButton("remove-button", "Remove", bookRemover);
     const readToggleButton = createButton("read-toggle", "Toggle Read", readToggler);
     bookInfo.classList.add("book-info");
     info.classList.add("about-book");
@@ -69,25 +77,24 @@ function createCard(book) {
     return div;
   }
   return {
-    book,
-    imageLink,
-    alt,
-    createDivCard(bookRemover, readToggler) {
+    createDivCard(card, bookRemover, readToggler) {
       const alternateBackground = (index) => {
         return index % 2 == 0 ? "rgb(220, 220, 220)" : "rgb(235, 235, 235)";
       };
       const div = document.createElement("div");
-      setBookPhoto(div);
-      setBookInfo(div, bookRemover, readToggler);
+      setBookPhoto(card, div);
+      const book = card.book;
+      setBookInfo(div, book, bookRemover, readToggler);
       div.classList.add("card");
-      div.setAttribute("index", book.index);
-      div.style.backgroundColor = alternateBackground(book.index);
+      const index = book.index;
+      div.setAttribute("index", index);
+      div.style.backgroundColor = alternateBackground(index);
       return div;
     }
   };
-}
+})(document);
 
-let modalForm = (function() {
+let modalForm = (function(document) {
   const modal = document.getElementById("new-book-modal");
   const newBookBtn = document.getElementById("new-book");
   const closeSpan = document.getElementById("close-modal");
@@ -110,7 +117,7 @@ let modalForm = (function() {
     hideModal();
   }
   return {
-    init() {
+    init(window) {
       newBookBtn.addEventListener("click", () => {
         modal.style.display = "flex";
         document.body.style.overflow = "hidden";
@@ -126,9 +133,9 @@ let modalForm = (function() {
     },
     restoreFields
   };
-})();
+})(document);
 
-let libraryApp = (function() {
+let libraryApp = (function(window, document, cardCreator) {
   let library = [];
   let modal = modalForm;
   function getBookFromModal() {
@@ -155,7 +162,7 @@ let libraryApp = (function() {
     let index = 0;
     library.forEach(book => {
       book.index = index;
-      const divCard = createCard(book).createDivCard(removeBookFromLibrary, readToggle);
+      const divCard = cardCreator.createDivCard(createCard(book), removeBookFromLibrary, readToggle);
       booksContainerDiv.appendChild(divCard);
       index += 1;
     });
@@ -190,13 +197,13 @@ let libraryApp = (function() {
   return {
     init() {
       library = fetchLibraryFromLocalStorage();
-      modalForm.init();
+      modalForm.init(window);
       if(library !== []) {
         displayBooks();
       }
       document.getElementById("submit-button").addEventListener("click", addBookToLibrary);
     }
   };
-})();
+})(window, document, cardCreator);
 
 libraryApp.init();
