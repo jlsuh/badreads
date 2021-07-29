@@ -1,29 +1,27 @@
-const createBook = function(title, author, pages, imageLink, alreadyRead) {
-  const newBook = Object.create(bookProto);
-  return Object.assign(newBook, {title, author, pages, imageLink, alreadyRead});
-};
-const bookProto = {
-  info() {
-    let readValue = this.alreadyRead ? "already read" : "not read yet";
-    return `${this.title} by ${this.author}, ${this.pages} pages, ${readValue}`;
-  },
-  toggleRead() {
-    this.alreadyRead = !this.alreadyRead;
-  }
-};
+function createBook(title, author, pages, imageLink, alreadyRead) {
+  return {
+    title,
+    author,
+    pages,
+    imageLink,
+    alreadyRead,
+    toggleRead() {
+      this.alreadyRead = !this.alreadyRead;
+    },
+    info() {
+      let readValue = this.alreadyRead ? "already read" : "not read yet";
+      return `${this.title} by ${this.author}, ${this.pages} pages, ${readValue}`;
+    }
+  };
+}
 
-const createCard = function(book) {
-  const newCard = Object.create(cardProto);
+function createCard(book) {
   let imageLink;
   let alt;
   [imageLink, alt] =
-    (book.imageLink !== "" && newCard.isValidHttpUrl(book.imageLink)) ?
+    (book.imageLink !== "" && isValidHttpUrl(book.imageLink)) ?
       [book.imageLink, `${book.title} book photo`] : ["/img/no-photo.jpg", "No photo provided photo"];
-  let associatedDiv = document.createElement("div");
-  return Object.assign(newCard, {book, imageLink, alt, associatedDiv});
-};
-const cardProto = {
-  isValidHttpUrl(str) {
+  function isValidHttpUrl(str) {
     let url;
     try {
       url = new URL(str);
@@ -31,56 +29,62 @@ const cardProto = {
       return false;  
     }
     return url.protocol === "http:" || url.protocol === "https:";
-  },
-  createImage() {
+  }
+  function createImage() {
     const img = document.createElement("img");
-    img.src = this.imageLink;
-    img.alt = this.alt;
+    img.src = imageLink;
+    img.alt = alt;
     return img;
-  },
-  createButton(className, textContent, callback) {
+  }
+  function createButton(className, textContent, callback) {
     const removeButton = document.createElement("button");
     removeButton.classList.add(className);
     removeButton.textContent = textContent;
     removeButton.addEventListener("click", callback);
     return removeButton;
-  },
-  createBookPhoto() {
+  }
+  function createBookPhoto(div) {
     const bookPhoto = document.createElement("div");
-    const img = this.createImage();
+    const img = createImage();
     bookPhoto.classList = "book-photo";
     bookPhoto.appendChild(img);
-    this.associatedDiv.appendChild(bookPhoto);
-    return this;
-  },
-  createBookInfo(bookRemover, readToggler) {
+    div.appendChild(bookPhoto);
+    return div;
+  }
+  function createBookInfo(div, bookRemover, readToggler) {
     const bookInfo = document.createElement("div");
     const info = document.createElement("div");
-    const removeButton = this.createButton("remove-button", "Remove", bookRemover);
+    const removeButton = createButton("remove-button", "Remove", bookRemover);
     const buttonContainer = document.createElement("div");
-    const readToggleButton = this.createButton("read-toggle", "Toggle Read", readToggler);
+    const readToggleButton = createButton("read-toggle", "Toggle Read", readToggler);
     bookInfo.classList.add("book-info");
     info.classList.add("about-book");
     buttonContainer.classList.add("buttons-container");
-    info.textContent = this.book.info();
+    info.textContent = book.info();
     buttonContainer.appendChild(removeButton);
     buttonContainer.appendChild(readToggleButton);
     bookInfo.appendChild(buttonContainer);
     bookInfo.appendChild(info);
-    this.associatedDiv.appendChild(bookInfo);
-    return this;
-  },
-  createDivCard(bookRemover, readToggler) {
-    const alternateBackground = (index) => {
-      return index % 2 == 0 ? "rgb(220, 220, 220)" : "rgb(235, 235, 235)";
-    };
-    const divCard = this.createBookPhoto().createBookInfo(bookRemover, readToggler).associatedDiv;
-    divCard.classList.add("card");
-    divCard.setAttribute("index", this.book.index);
-    divCard.style.backgroundColor = alternateBackground(this.book.index);
-    return divCard;
+    div.appendChild(bookInfo);
+    return div;
   }
-};
+  return {
+    book,
+    imageLink,
+    alt,
+    createDivCard(bookRemover, readToggler) {
+      const alternateBackground = (index) => {
+        return index % 2 == 0 ? "rgb(220, 220, 220)" : "rgb(235, 235, 235)";
+      };
+      const div = document.createElement("div");
+      const divCard = createBookInfo(createBookPhoto(div), bookRemover, readToggler);
+      divCard.classList.add("card");
+      divCard.setAttribute("index", book.index);
+      divCard.style.backgroundColor = alternateBackground(book.index);
+      return divCard;
+    }
+  };
+}
 
 let modalForm = (function() {
   const modal = document.getElementById("new-book-modal");
