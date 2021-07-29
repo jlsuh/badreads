@@ -92,11 +92,11 @@ let modalForm = (function() {
   const newBookBtn = document.getElementById("new-book");
   const closeSpan = document.getElementById("close-modal");
   const bookFields = Array.from(document.getElementsByClassName("book-field"));
-  this.hideModal = function() {
+  function hideModal() {
     modal.style.display = "none";
     document.body.style.overflow = null;
   }
-  this.restoreFields = function() {
+  function restoreFields() {
     bookFields.forEach(bookField => {
       if(bookField.type === "text") {
         bookField.value = "";
@@ -105,17 +105,17 @@ let modalForm = (function() {
       }
     });
   }
-  this.restoreDefault = function() {
+  function restoreDefault() {
     restoreFields();
     hideModal();
   }
   return {
-    init: function() {
-      newBookBtn.addEventListener("click", function() {
+    init() {
+      newBookBtn.addEventListener("click", () => {
         modal.style.display = "flex";
         document.body.style.overflow = "hidden";
       });
-      closeSpan.addEventListener("click", function() {
+      closeSpan.addEventListener("click", () => {
         restoreDefault();
       });
       window.addEventListener("click", function(e) {
@@ -124,9 +124,7 @@ let modalForm = (function() {
         }
       });
     },
-    get restoreFields() {
-      return restoreFields;
-    },
+    restoreFields
   }
 })();
 
